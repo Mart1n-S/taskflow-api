@@ -1,0 +1,54 @@
+@baseUrl = http://localhost:3000/api
+
+### ❌ Email invalide → 400
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "email": "pas-un-email",
+  "name": "Alice",
+  "password": "password123"
+}
+
+### ❌ Mot de passe trop court → 400
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "email": "alice@test.com",
+  "name": "Alice",
+  "password": "123"
+}
+
+### ❌ Rôle invalide → 400
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "email": "alice@test.com",
+  "name": "Alice",
+  "password": "password123",
+  "role": "superadmin"
+}
+
+### ❌ Propriété inconnue (whitelist) → 400
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "email": "alice@test.com",
+  "name": "Alice",
+  "password": "password123",
+  "adminOverride": true
+}
+
+### ✅ Données valides → 201
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "email": "alice@taskflow.dev",
+  "name": "Alice Dupont",
+  "password": "MotDePasse123",
+  "role": "member"
+}
