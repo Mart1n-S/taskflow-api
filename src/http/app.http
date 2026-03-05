@@ -1,0 +1,5 @@
+### Racine
+GET http://localhost:3000
+
+### Health check
+GET http://localhost:3000/health
