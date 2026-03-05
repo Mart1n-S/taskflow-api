@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:3000/api
 
-### Lister tous les utilisateurs
+### Lister les utilisateurs (sans passwordHash)
 GET {{baseUrl}}/users
 
 ### Créer un utilisateur
@@ -10,6 +10,7 @@ Content-Type: application/json
 {
   "email": "alice@taskflow.dev",
   "name": "Alice Dupont",
+  "password": "MotDePasse123",
   "role": "admin"
 }
 
@@ -19,15 +20,16 @@ Content-Type: application/json
 
 {
   "email": "bob@taskflow.dev",
+  "password": "MotDePasse123",
   "name": "Bob Martin",
   "role": "member"
 }
 
 ### Récupérer un utilisateur (remplacer l'ID)
-GET {{baseUrl}}/users/93cbf7a6-46f5-4983-b4fc-e46d6e864dfa
+GET {{baseUrl}}/users/cb87759e-f2ad-4556-a2e9-b343c761bbba
 
 ### Mettre à jour un utilisateur
-PATCH {{baseUrl}}/users/93cbf7a6-46f5-4983-b4fc-e46d6e864dfa
+PATCH {{baseUrl}}/users/cb87759e-f2ad-4556-a2e9-b343c761bbba
 Content-Type: application/json
 
 {
@@ -35,7 +37,7 @@ Content-Type: application/json
 }
 
 ### Supprimer un utilisateur
-DELETE {{baseUrl}}/users/d6262124-ed83-4941-b8ab-f6a60808504d
+DELETE {{baseUrl}}/users/447fedbe-852c-413a-bd33-5b2daeceba37
 
 ### Cas 404 - ID inexistant
 GET {{baseUrl}}/users/00000000-0000-0000-0000-000000000000
@@ -46,5 +48,6 @@ Content-Type: application/json
 
 {
   "email": "alice@taskflow.dev",
+  "password": "MotDePasse123",
   "name": "Autre Alice"
 }

@@ -3,21 +3,26 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
-import { randomUUID } from 'crypto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User, UserRole } from './interfaces/user.interface';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [];
+  constructor(
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
+  ) {}
 
   /**
    * Find all users
    * @returns An array of users
    */
-  findAll(): User[] {
-    return this.users;
+  async findAll(): Promise<User[]> {
+    return this.usersRepository.find();
   }
 
   /**
@@ -26,8 +31,8 @@ export class UsersService {
    * @returns The user with the given ID
    * @throws NotFoundException if the user is not found
    */
-  findOne(id: string): User {
-    const user = this.users.find((u) => u.id === id);
+  async findOne(id: string): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException(`User #${id} not found`);
     }
@@ -37,10 +42,10 @@ export class UsersService {
   /**
    * Find a user by email
    * @param email The email of the user to find
-   * @returns The user with the given email or undefined if not found
+   * @returns The user with the given email or null if not found
    */
-  findByEmail(email: string): User | undefined {
-    return this.users.find((u) => u.email === email);
+  async findByEmail(email: string): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { email } });
   }
 
   /**
@@ -49,20 +54,18 @@ export class UsersService {
    * @returns The created user
    * @throws ConflictException if the email is already taken
    */
-  create(dto: CreateUserDto): User {
-    if (this.findByEmail(dto.email)) {
+  async create(dto: CreateUserDto): Promise<User> {
+    if (await this.findByEmail(dto.email)) {
       throw new ConflictException(`Email ${dto.email} is already taken`);
     }
-    const newUser: User = {
-      id: randomUUID(),
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+    const user = this.usersRepository.create({
       email: dto.email,
       name: dto.name,
-      role: dto.role ?? UserRole.MEMBER,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.users.push(newUser);
-    return newUser;
+      role: dto.role,
+      passwordHash,
+    });
+    return this.usersRepository.save(user);
   }
 
   /**
@@ -70,27 +73,28 @@ export class UsersService {
    * @param id The ID of the user to update
    * @param dto The data transfer object containing the updated user information
    * @returns The updated user
-   * @throws NotFoundException if the user is not found with the method findOne
+   * @throws NotFoundException if the user is not found
    * @throws ConflictException if the new email is already taken by another user
    */
-  update(id: string, dto: UpdateUserDto): User {
-    const user = this.findOne(id);
+  async update(id: string, dto: UpdateUserDto): Promise<User> {
+    const user = await this.findOne(id);
     if (dto.email && dto.email !== user.email) {
-      if (this.findByEmail(dto.email)) {
+      if (await this.findByEmail(dto.email)) {
         throw new ConflictException(`Email ${dto.email} is already taken`);
       }
     }
-    Object.assign(user, dto, { updatedAt: new Date() });
-    return user;
+    Object.assign(user, dto);
+    return this.usersRepository.save(user);
   }
 
   /**
    * Remove a user by ID
    * @param id The ID of the user to remove
+   * @returns void
    * @throws NotFoundException if the user is not found
    */
-  remove(id: string): void {
-    this.findOne(id);
-    this.users = this.users.filter((u) => u.id !== id);
+  async remove(id: string): Promise<void> {
+    const user = await this.findOne(id);
+    await this.usersRepository.remove(user);
   }
 }
