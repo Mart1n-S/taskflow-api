@@ -1,0 +1,50 @@
+@baseUrl = http://localhost:3000/api
+
+### Lister tous les utilisateurs
+GET {{baseUrl}}/users
+
+### Créer un utilisateur
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "email": "alice@taskflow.dev",
+  "name": "Alice Dupont",
+  "role": "admin"
+}
+
+### Créer un deuxième utilisateur
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "email": "bob@taskflow.dev",
+  "name": "Bob Martin",
+  "role": "member"
+}
+
+### Récupérer un utilisateur (remplacer l'ID)
+GET {{baseUrl}}/users/93cbf7a6-46f5-4983-b4fc-e46d6e864dfa
+
+### Mettre à jour un utilisateur
+PATCH {{baseUrl}}/users/93cbf7a6-46f5-4983-b4fc-e46d6e864dfa
+Content-Type: application/json
+
+{
+  "name": "Alice Dupont-Martin"
+}
+
+### Supprimer un utilisateur
+DELETE {{baseUrl}}/users/d6262124-ed83-4941-b8ab-f6a60808504d
+
+### Cas 404 - ID inexistant
+GET {{baseUrl}}/users/00000000-0000-0000-0000-000000000000
+
+### Cas 409 - Email déjà utilisé
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "email": "alice@taskflow.dev",
+  "name": "Autre Alice"
+}
