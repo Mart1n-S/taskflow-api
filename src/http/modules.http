@@ -1,0 +1,14 @@
+### Lister les utilisateurs
+GET http://localhost:3000/api/users
+
+### Lister les équipes
+GET http://localhost:3000/api/teams
+
+### Lister les projets
+GET http://localhost:3000/api/projects
+
+### Lister les tâches
+GET http://localhost:3000/api/tasks
+
+### Lister les commentaires
+GET http://localhost:3000/api/comments
