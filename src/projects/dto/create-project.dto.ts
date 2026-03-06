@@ -5,7 +5,7 @@ import {
   IsEnum,
   IsUUID,
 } from 'class-validator';
-import { ProjectStatus } from '../interfaces/project.interface';
+import { ProjectStatus } from '../enums/project-status.enum';
 
 export class CreateProjectDto {
   @IsString()

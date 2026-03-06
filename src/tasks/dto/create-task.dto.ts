@@ -5,7 +5,7 @@ import {
   IsEnum,
   IsUUID,
 } from 'class-validator';
-import { TaskStatus, TaskPriority } from '../interfaces/task.interface';
+import { TaskStatus, TaskPriority } from '../enums';
 
 export class CreateTaskDto {
   @IsString()

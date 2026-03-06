@@ -37,7 +37,7 @@ Content-Type: application/json
 }
 
 ### Supprimer un utilisateur
-DELETE {{baseUrl}}/users/447fedbe-852c-413a-bd33-5b2daeceba37
+DELETE {{baseUrl}}/users/58a6ebfb-4d3d-43a4-b64c-fd9168b1d012
 
 ### Cas 404 - ID inexistant
 GET {{baseUrl}}/users/00000000-0000-0000-0000-000000000000
