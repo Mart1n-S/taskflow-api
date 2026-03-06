@@ -6,9 +6,11 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Team } from '../../teams/entities/team.entity';
 import { ProjectStatus } from '../enums/project-status.enum';
+import { Task } from '../../tasks/entities/task.entity';
 
 @Entity('projects')
 export class Project {
@@ -34,6 +36,9 @@ export class Project {
   })
   @JoinColumn({ name: 'team_id' })
   team: Team;
+
+  @OneToMany(() => Task, (task) => task.project)
+  tasks: Task[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
