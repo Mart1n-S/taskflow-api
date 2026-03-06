@@ -1,0 +1,27 @@
+@baseUrl = http://localhost:3000/api
+
+### Créer une équipe
+POST {{baseUrl}}/teams
+Content-Type: application/json
+
+{
+  "name": "Équipe Alpha",
+  "description": "Équipe principale de développement"
+}
+
+### Lister les équipes (avec membres)
+GET {{baseUrl}}/teams
+
+### Ajouter un membre (remplacer les IDs)
+POST {{baseUrl}}/teams/6ebbae1d-f0c9-44bd-b3d3-58638505f223/members
+Content-Type: application/json
+
+{
+  "userId": "cb87759e-f2ad-4556-a2e9-b343c761bbba"
+}
+
+### Voir l'équipe avec ses membres et projets
+GET {{baseUrl}}/teams/6ebbae1d-f0c9-44bd-b3d3-58638505f223
+
+### Retirer un membre
+DELETE {{baseUrl}}/teams/6ebbae1d-f0c9-44bd-b3d3-58638505f223/members/cb87759e-f2ad-4556-a2e9-b343c761bbba

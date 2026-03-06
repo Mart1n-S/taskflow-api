@@ -4,8 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToMany,
 } from 'typeorm';
 import { UserRole } from '../enums/user-role.enum';
+import { Team } from '../../teams/entities/team.entity';
 
 @Entity('users')
 export class User {
@@ -27,6 +29,9 @@ export class User {
     default: UserRole.MEMBER,
   })
   role!: UserRole;
+
+  @ManyToMany(() => Team, (team) => team.members)
+  teams!: Team[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
