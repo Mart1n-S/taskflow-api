@@ -97,4 +97,17 @@ export class UsersService {
     const user = await this.findOne(id);
     await this.usersRepository.remove(user);
   }
+
+  /**
+   * Find a user by email with password hash
+   * @param email The email of the user to find
+   * @returns The user with passwordHash or null if not found
+   */
+  async findByEmailWithPassword(email: string): Promise<User | null> {
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .addSelect('user.passwordHash')
+      .where('user.email = :email', { email })
+      .getOne();
+  }
 }

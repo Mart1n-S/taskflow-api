@@ -1,0 +1,27 @@
+@baseUrl = http://localhost:3000/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNTcwY2YzYS1lNjNlLTRmNDctYWUxNi05M2ViZDY1ODc4MzgiLCJlbWFpbCI6ImFsaWNlQHRhc2tmbG93LmRldiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MjgxNjAyNiwiZXhwIjoxNzcyOTAyNDI2fQ.r9yyBd2HuKoSEyADN7aIHkUiPIEjZawUdB6wV5PIWEk
+
+### Login ✅
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@taskflow.dev",
+  "password": "password123"
+}
+
+### Login mauvais mot de passe → 401
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@taskflow.dev",
+  "password": "mauvais"
+}
+
+### Me — qui suis-je ?
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### Route protégée sans token → 401
+GET {{baseUrl}}/users
