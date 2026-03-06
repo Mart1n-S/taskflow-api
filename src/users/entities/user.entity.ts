@@ -12,30 +12,30 @@ import { Team } from '../../teams/entities/team.entity';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id: string;
 
   @Column({ unique: true, length: 255 })
-  email!: string;
+  email: string;
 
   @Column({ name: 'password_hash', select: false })
-  passwordHash!: string;
+  passwordHash: string;
 
   @Column({ length: 100 })
-  name!: string;
+  name: string;
 
   @Column({
     type: 'enum',
     enum: UserRole,
     default: UserRole.MEMBER,
   })
-  role!: UserRole;
+  role: UserRole;
 
   @ManyToMany(() => Team, (team) => team.members)
-  teams!: Team[];
+  teams: Team[];
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt!: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt!: Date;
+  updatedAt: Date;
 }

@@ -13,31 +13,31 @@ import { ProjectStatus } from '../enums/project-status.enum';
 @Entity('projects')
 export class Project {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id: string;
 
   @Column({ length: 200 })
-  name!: string;
+  name: string;
 
   @Column({ type: 'text', nullable: true })
-  description!: string;
+  description: string;
 
   @Column({
     type: 'enum',
     enum: ProjectStatus,
     default: ProjectStatus.DRAFT,
   })
-  status!: ProjectStatus;
+  status: ProjectStatus;
 
   @ManyToOne(() => Team, (team) => team.projects, {
     nullable: false,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'team_id' })
-  team!: Team;
+  team: Team;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt!: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt!: Date;
+  updatedAt: Date;
 }

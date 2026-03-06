@@ -10,7 +10,7 @@ import { TaskStatus, TaskPriority } from '../enums';
 export class CreateTaskDto {
   @IsString()
   @MaxLength(200)
-  title!: string;
+  title: string;
 
   @IsString()
   @MaxLength(2000)
@@ -30,7 +30,7 @@ export class CreateTaskDto {
   priority?: TaskPriority;
 
   @IsUUID('4')
-  projectId!: string;
+  projectId: string;
 
   @IsUUID('4')
   @IsOptional()

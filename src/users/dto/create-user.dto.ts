@@ -10,12 +10,12 @@ import { UserRole } from '../enums/user-role.enum';
 
 export class CreateUserDto {
   @IsEmail({}, { message: 'Adresse email invalide' })
-  email!: string;
+  email: string;
 
   @IsString()
   @MinLength(2, { message: 'Le nom doit faire au moins 2 caractères' })
   @MaxLength(100)
-  name!: string;
+  name: string;
 
   @IsEnum(UserRole, {
     message: `Le rôle doit être l'un de : ${Object.values(UserRole).join(', ')}`,
@@ -25,5 +25,5 @@ export class CreateUserDto {
 
   @IsString()
   @MinLength(8, { message: 'Le mot de passe doit faire au moins 8 caractères' })
-  password!: string;
+  password: string;
 }

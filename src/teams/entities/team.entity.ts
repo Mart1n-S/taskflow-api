@@ -14,13 +14,13 @@ import { User } from '../../users/entities/user.entity';
 @Entity('teams')
 export class Team {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id: string;
 
   @Column({ length: 100, unique: true })
-  name!: string;
+  name: string;
 
   @Column({ type: 'text', nullable: true })
-  description!: string;
+  description: string;
 
   @ManyToMany(() => User, (user) => user.teams)
   @JoinTable({
@@ -34,16 +34,16 @@ export class Team {
       referencedColumnName: 'id',
     },
   })
-  members!: User[];
+  members: User[];
 
   @OneToMany(() => Project, (project) => project.team, {
     cascade: true,
   })
-  projects!: Project[];
+  projects: Project[];
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt!: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt!: Date;
+  updatedAt: Date;
 }

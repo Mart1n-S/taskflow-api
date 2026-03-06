@@ -10,7 +10,7 @@ import { ProjectStatus } from '../enums/project-status.enum';
 export class CreateProjectDto {
   @IsString()
   @MaxLength(200)
-  name!: string;
+  name: string;
 
   @IsString()
   @MaxLength(1000)
@@ -24,5 +24,5 @@ export class CreateProjectDto {
   status?: ProjectStatus;
 
   @IsUUID('4')
-  teamId!: string;
+  teamId: string;
 }
