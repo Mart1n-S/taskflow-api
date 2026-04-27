@@ -1,7 +1,9 @@
 @baseUrl = http://localhost:3000/api
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNTcwY2YzYS1lNjNlLTRmNDctYWUxNi05M2ViZDY1ODc4MzgiLCJlbWFpbCI6ImFsaWNlQHRhc2tmbG93LmRldiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MjgxNjAyNiwiZXhwIjoxNzcyOTAyNDI2fQ.r9yyBd2HuKoSEyADN7aIHkUiPIEjZawUdB6wV5PIWEk
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ODQyY2VjZS0yNTZjLTQxOWUtOTY1Ni04N2RiODdlMWI0YmIiLCJlbWFpbCI6ImFsaWNlQHRhc2tmbG93LmRldiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NzMwMTAyOSwiZXhwIjoxNzc3Mzg3NDI5fQ.a76h3yaA5W__HvKCLZtYaSoo-aQZP5B6N3GS9u50QWA
+@viewerToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzNWJlYjJmNS1hYzVjLTRhMzctOTllOC05MjA5MTgwMTE4NDIiLCJlbWFpbCI6ImNoYXJsaWVAdGFza2Zsb3cuZGV2Iiwicm9sZSI6InZpZXdlciIsImlhdCI6MTc3NzMwMTA1OSwiZXhwIjoxNzc3Mzg3NDU5fQ.9-bsE5_uV23uxhEMpeXs8vEuhzwGizpEFP0DOYtk8t4
+@bobToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiNmRjZjI5Yi1mZmY1LTQwMzUtYTg1MS05MzNlNjQ4MzZlNWYiLCJlbWFpbCI6ImJvYkB0YXNrZmxvdy5kZXYiLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzc3MzAxMDc3LCJleHAiOjE3NzczODc0Nzd9.zKt3ktL7y9H8xKKoRFAZ-0pifWvFAeniMpehQ_SLzh0
 
-### Login ✅
+### Login Alice (admin) ✅
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
@@ -10,7 +12,7 @@ Content-Type: application/json
   "password": "password123"
 }
 
-### Login mauvais mot de passe → 401
+###  Login mauvais mot de passe → 401
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
@@ -19,9 +21,53 @@ Content-Type: application/json
   "password": "mauvais"
 }
 
+### Login Charlie (viewer)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "charlie@taskflow.dev",
+  "password": "password123"
+}
+
+### Login Bob (member)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "bob@taskflow.dev",
+  "password": "password123"
+}
+
 ### Me — qui suis-je ?
 GET {{baseUrl}}/auth/me
-Authorization: Bearer {{token}}
+Authorization: Bearer {{adminToken}}
 
 ### Route protégée sans token → 401
 GET {{baseUrl}}/users
+
+### ADMIN peut supprimer → 204
+DELETE {{baseUrl}}/users/35beb2f5-ac5c-4a37-99e8-920918011842
+Authorization: Bearer {{adminToken}}
+
+### VIEWER ne peut pas supprimer → 403
+DELETE {{baseUrl}}/users/5842cece-256c-419e-9656-87db87e1b4bb
+Authorization: Bearer {{viewerToken}}
+
+### MEMBER peut modifier son propre profil → 200
+PATCH {{baseUrl}}/users/b6dcf29b-fff5-4035-a851-933e64836e5f
+Authorization: Bearer {{bobToken}}
+Content-Type: application/json
+
+{
+  "name": "Bob Martin-Dupont"
+}
+
+### MEMBER ne peut PAS modifier le profil d'Alice → 403
+PATCH {{baseUrl}}/users/5842cece-256c-419e-9656-87db87e1b4bb
+Authorization: Bearer {{bobToken}}
+Content-Type: application/json
+
+{
+  "name": "Alice Hacké"
+}

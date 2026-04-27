@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -9,6 +10,8 @@ import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { UserRole } from './enums/user-role.enum';
+import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class UsersService {
@@ -72,11 +75,23 @@ export class UsersService {
    * Update an existing user
    * @param id The ID of the user to update
    * @param dto The data transfer object containing the updated user information
+   * @param currentUser The currently authenticated user
    * @returns The updated user
+   * @throws ForbiddenException if a non-admin tries to update another user's profile
    * @throws NotFoundException if the user is not found
    * @throws ConflictException if the new email is already taken by another user
    */
-  async update(id: string, dto: UpdateUserDto): Promise<User> {
+  async update(
+    id: string,
+    dto: UpdateUserDto,
+    currentUser: JwtPayload,
+  ): Promise<User> {
+    if (currentUser.role !== UserRole.ADMIN && currentUser.id !== id) {
+      throw new ForbiddenException(
+        'Vous ne pouvez modifier que votre propre profil',
+      );
+    }
+
     const user = await this.findOne(id);
     if (dto.email && dto.email !== user.email) {
       if (await this.findByEmail(dto.email)) {
