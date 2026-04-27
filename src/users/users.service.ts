@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
   ForbiddenException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -15,6 +16,8 @@ import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
@@ -58,6 +61,7 @@ export class UsersService {
    * @throws ConflictException if the email is already taken
    */
   async create(dto: CreateUserDto): Promise<User> {
+    this.logger.log(`Création d'un utilisateur : ${dto.email}`);
     if (await this.findByEmail(dto.email)) {
       throw new ConflictException(`Email ${dto.email} is already taken`);
     }
@@ -68,7 +72,9 @@ export class UsersService {
       role: dto.role,
       passwordHash,
     });
-    return this.usersRepository.save(user);
+    const created = await this.usersRepository.save(user);
+    this.logger.log(`Utilisateur créé : ${created.id}`);
+    return created;
   }
 
   /**
@@ -86,6 +92,7 @@ export class UsersService {
     dto: UpdateUserDto,
     currentUser: JwtPayload,
   ): Promise<User> {
+    this.logger.log(`Mise à jour utilisateur : ${id} par ${currentUser.id}`);
     if (currentUser.role !== UserRole.ADMIN && currentUser.id !== id) {
       throw new ForbiddenException(
         'Vous ne pouvez modifier que votre propre profil',
@@ -109,8 +116,10 @@ export class UsersService {
    * @throws NotFoundException if the user is not found
    */
   async remove(id: string): Promise<void> {
+    this.logger.warn(`Suppression de l'utilisateur : ${id}`);
     const user = await this.findOne(id);
     await this.usersRepository.remove(user);
+    this.logger.warn(`Utilisateur supprimé : ${id}`);
   }
 
   /**

@@ -1,4 +1,5 @@
 @baseUrl = http://localhost:3000/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ODQyY2VjZS0yNTZjLTQxOWUtOTY1Ni04N2RiODdlMWI0YmIiLCJlbWFpbCI6ImFsaWNlQHRhc2tmbG93LmRldiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NzMwMjc0MiwiZXhwIjoxNzc3Mzg5MTQyfQ.PWBUn18rMsqbGiMBnGmVvB7VNAW5_NqB3urbrqK9dZM
 
 ### Lister les utilisateurs (sans passwordHash)
 GET {{baseUrl}}/users
@@ -51,3 +52,7 @@ Content-Type: application/json
   "password": "MotDePasse123",
   "name": "Autre Alice"
 }
+
+### Cas 404 - ID inexistant
+GET {{baseUrl}}/users/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
