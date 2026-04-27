@@ -14,9 +14,22 @@ describe('AppController', () => {
     appController = app.get<AppController>(AppController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+  describe('getHello', () => {
+    it("retourne les informations de l'API", () => {
+      expect(appController.getHello()).toEqual({
+        message: 'TaskFlow API',
+        version: '1.0.0',
+      });
+    });
+  });
+
+  describe('healthCheck', () => {
+    it('retourne le statut ok avec un timestamp', () => {
+      const result = appController.healthCheck();
+
+      expect(result.status).toBe('ok');
+      expect(result.timestamp).toBeDefined();
+      expect(new Date(result.timestamp).toISOString()).toBe(result.timestamp);
     });
   });
 });
