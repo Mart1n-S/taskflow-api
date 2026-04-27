@@ -57,7 +57,7 @@ export class UsersService {
   /**
    * Create a new user
    * @param dto The data transfer object containing the user information
-   * @returns The created user
+   * @returns The created user without passwordHash
    * @throws ConflictException if the email is already taken
    */
   async create(dto: CreateUserDto): Promise<User> {
@@ -72,9 +72,13 @@ export class UsersService {
       role: dto.role,
       passwordHash,
     });
-    const created = await this.usersRepository.save(user);
-    this.logger.log(`Utilisateur créé : ${created.id}`);
-    return created;
+    const saved = await this.usersRepository.save(user);
+    this.logger.log(`Utilisateur créé : ${saved.id}`);
+
+    // select: false s'applique uniquement aux SELECT SQL - save() retourne
+    // l'objet en mémoire avec passwordHash inclus. On le supprime manuellement.
+    delete (saved as Partial<User>).passwordHash;
+    return saved;
   }
 
   /**
