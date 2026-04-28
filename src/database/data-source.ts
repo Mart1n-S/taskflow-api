@@ -2,7 +2,10 @@ import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 import { join } from 'path';
 
-dotenv.config();
+// Charger le bon fichier .env selon NODE_ENV
+// En CI, les variables sont déjà injectées — dotenv ne les écrase pas
+const envFile = process.env.NODE_ENV === 'test' ? '.env.test' : '.env';
+dotenv.config({ path: envFile, override: false });
 
 export const AppDataSource = new DataSource({
   type: 'postgres',

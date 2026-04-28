@@ -48,6 +48,18 @@ jobs:
       - name: Tests unitaires
         run: npm run test -- --coverage
 
+      - name: Appliquer les migrations
+        run: npm run migration:run
+        env:
+          NODE_ENV: test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: taskflow_test
+          DB_USER: taskflow
+          DB_PASSWORD: taskflow
+          JWT_SECRET: test-secret-key-for-ci
+          JWT_EXPIRES_IN: 1h
+
       - name: Tests e2e
         run: npm run test:e2e
         env:
