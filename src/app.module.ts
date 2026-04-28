@@ -13,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { NotificationsModule } from './notifications/notifications.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { NotificationsModule } from './notifications/notifications.module';
         logging: config.get('NODE_ENV') === 'development',
       }),
     }),
+    HealthModule,
     NotificationsModule,
     AuthModule,
     UsersModule,

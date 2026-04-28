@@ -7,10 +7,14 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { join } from 'node:path';
+import helmet from 'helmet';
 
 async function bootstrap() {
   // NestExpressApplication requis pour useStaticAssets (fichiers HTML de test)
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Helmet en premier - sécurise les headers HTTP avant tout autre middleware
+  app.use(helmet());
 
   app.setGlobalPrefix('api');
   app.useGlobalPipes(

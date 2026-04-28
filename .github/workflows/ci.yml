@@ -1,0 +1,76 @@
+name: CI TaskFlow API
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  lint-and-test:
+    name: Lint & Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: taskflow_test
+          POSTGRES_USER: taskflow
+          POSTGRES_PASSWORD: taskflow
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Linter ESLint
+        run: npm run lint
+
+      - name: Tests unitaires
+        run: npm run test -- --coverage
+
+      - name: Tests e2e
+        run: npm run test:e2e
+        env:
+          NODE_ENV: test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: taskflow_test
+          DB_USER: taskflow
+          DB_PASSWORD: taskflow
+          JWT_SECRET: test-secret-key-for-ci
+          JWT_EXPIRES_IN: 1h
+
+  build-docker:
+    name: Build Docker Image
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t taskflow-api:${{ github.sha }} .
+
+      - name: Vérifier la taille de l'image
+        run: docker images taskflow-api
