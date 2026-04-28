@@ -12,6 +12,7 @@ import { CommentsModule } from './comments/comments.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
         logging: config.get('NODE_ENV') === 'development',
       }),
     }),
+    PrismaModule,
     AuthModule,
     UsersModule,
     TeamsModule,
