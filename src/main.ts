@@ -1,13 +1,17 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { join } from 'node:path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // NestExpressApplication requis pour useStaticAssets (fichiers HTML de test)
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
@@ -24,6 +28,9 @@ async function bootstrap() {
     new LoggingInterceptor(),
     new TransformInterceptor(), // TODO: désactiver si les tests e2e (S14) échouent (.body.data au lieu de .body)
   );
+
+  // Servir les fichiers statiques depuis /public (ex: test-ws.html)
+  app.useStaticAssets(join(__dirname, '..', 'public'));
 
   if (process.env.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
@@ -55,4 +62,5 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+
+void bootstrap();

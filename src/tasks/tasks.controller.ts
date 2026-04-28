@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -22,6 +23,7 @@ import {
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { Task } from './entities/task.entity';
 
 @ApiTags('tasks')
 @ApiBearerAuth('JWT-auth')
@@ -34,14 +36,14 @@ export class TasksController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer une tâche' })
   @ApiCreatedResponse({ description: 'Tâche créée avec succès' })
-  create(@Body() createTaskDto: CreateTaskDto) {
+  create(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
     return this.tasksService.create(createTaskDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Lister toutes les tâches' })
   @ApiOkResponse({ description: 'Liste des tâches' })
-  findAll() {
+  findAll(): Promise<Task[]> {
     return this.tasksService.findAll();
   }
 
@@ -49,16 +51,19 @@ export class TasksController {
   @ApiOperation({ summary: 'Récupérer une tâche par ID' })
   @ApiOkResponse({ description: 'Tâche trouvée' })
   @ApiNotFoundResponse({ description: 'Tâche introuvable' })
-  findOne(@Param('id') id: string) {
-    return this.tasksService.findOne(+id);
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Task> {
+    return this.tasksService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Modifier une tâche' })
   @ApiOkResponse({ description: 'Tâche mise à jour' })
   @ApiNotFoundResponse({ description: 'Tâche introuvable' })
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-    return this.tasksService.update(+id, updateTaskDto);
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateTaskDto: UpdateTaskDto,
+  ): Promise<Task> {
+    return this.tasksService.update(id, updateTaskDto);
   }
 
   @Delete(':id')
@@ -66,7 +71,7 @@ export class TasksController {
   @ApiOperation({ summary: 'Supprimer une tâche' })
   @ApiNoContentResponse({ description: 'Tâche supprimée' })
   @ApiNotFoundResponse({ description: 'Tâche introuvable' })
-  remove(@Param('id') id: string) {
-    return this.tasksService.remove(+id);
+  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.tasksService.remove(id);
   }
 }

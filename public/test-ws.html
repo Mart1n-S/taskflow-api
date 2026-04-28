@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Test WebSocket TaskFlow</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+
+<body>
+    <h1>Test WebSocket</h1>
+    <div>
+        <label>JWT Token : <input id="token" type="text" size="60" /></label>
+        <button onclick="connect()">Se connecter</button>
+    </div>
+    <div>
+        <label>Project ID : <input id="projectId" type="text" /></label>
+        <button onclick="joinProject()">Rejoindre</button>
+    </div>
+    <hr />
+    <h2>Événements reçus :</h2>
+    <ul id="events"></ul>
+
+    <script>
+        let socket;
+        function log(msg) {
+            const li = document.createElement('li');
+            li.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            document.getElementById('events').prepend(li);
+        }
+
+        function connect() {
+            const token = document.getElementById('token').value;
+            socket = io('http://localhost:3000/notifications', { auth: { token } });
+            socket.on('connect', () => log(`Connecté : ${socket.id}`));
+            socket.on('disconnect', () => log('Déconnecté'));
+            socket.on('task:assigned', (data) => log(`TÂCHE ASSIGNÉE : ${JSON.stringify(data)}`));
+        }
+
+        function joinProject() {
+            const projectId = document.getElementById('projectId').value;
+            socket.emit('join:project', projectId, (ack) => log(`Rejoint projet ${ack.joined}`));
+        }
+    </script>
+</body>
+
+</html>
