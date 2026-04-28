@@ -14,7 +14,24 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Helmet en premier - sécurise les headers HTTP avant tout autre middleware
-  app.use(helmet());
+  if (process.env.NODE_ENV === 'production') {
+    // En prod : CSP stricte
+    app.use(helmet());
+  } else {
+    // En dev : CSP assouplie pour test-ws.html (CDN socket.io + inline scripts)
+    app.use(
+      helmet({
+        contentSecurityPolicy: {
+          directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'", 'cdn.socket.io'],
+            scriptSrcAttr: ["'unsafe-inline'"],
+            connectSrc: ["'self'", 'ws:', 'wss:', 'cdn.socket.io', 'https:'],
+          },
+        },
+      }),
+    );
+  }
 
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
