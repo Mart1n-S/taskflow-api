@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
+const SEED_CREDENTIALS = 'password123';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { DataSource } from 'typeorm';
@@ -14,6 +15,7 @@ describe('Comments (e2e)', () => {
   let app: INestApplication;
   let dataSource: DataSource;
   let adminToken: string;
+  let adminId: string;
   let taskId: string;
   let commentId: string;
 
@@ -24,6 +26,7 @@ describe('Comments (e2e)', () => {
   beforeEach(async () => {
     await cleanDatabase(dataSource);
     const { admin } = await seedTestUsers(dataSource);
+    adminId = admin.id;
 
     const teamRepo = dataSource.getRepository(Team);
     const team = await teamRepo.save(teamRepo.create({ name: 'Test Team' }));
@@ -57,7 +60,7 @@ describe('Comments (e2e)', () => {
 
     const adminRes = await request(app.getHttpServer())
       .post('/api/auth/login')
-      .send({ email: 'admin@test.com', password: 'password123' });
+      .send({ email: 'admin@test.com', password: SEED_CREDENTIALS });
     adminToken = adminRes.body.access_token;
   });
 
@@ -134,6 +137,16 @@ describe('Comments (e2e)', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ taskId })
         .expect(400);
+    });
+
+    it('201 + auteur dans la reponse est l utilisateur connecte', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/api/comments')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ content: 'Commentaire auteur', taskId })
+        .expect(201);
+
+      expect(res.body.author.id).toBe(adminId);
     });
 
     it('401 sans token', () => {
