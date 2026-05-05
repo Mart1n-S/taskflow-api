@@ -130,6 +130,14 @@ describe('Tasks (e2e)', () => {
         .expect(400);
     });
 
+    it('400 si projectId manquant', () => {
+      return request(app.getHttpServer())
+        .post('/api/tasks')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ title: 'Tâche sans projet' })
+        .expect(400);
+    });
+
     it('401 sans token', () => {
       return request(app.getHttpServer())
         .post('/api/tasks')
@@ -147,6 +155,16 @@ describe('Tasks (e2e)', () => {
         .expect(200);
 
       expect(res.body.title).toBe('Titre modifié');
+    });
+
+    it('200 + status mis à jour (TODO -> IN_PROGRESS)', async () => {
+      const res = await request(app.getHttpServer())
+        .patch(`/api/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ status: 'in_progress' })
+        .expect(200);
+
+      expect(res.body.status).toBe('in_progress');
     });
 
     it('200 + assigné mis à jour', async () => {

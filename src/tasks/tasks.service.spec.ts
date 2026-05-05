@@ -175,6 +175,31 @@ describe('TasksService', () => {
       expect(gateway.sendToUser).not.toHaveBeenCalled();
     });
 
+    it('met à jour le status de la tache', async () => {
+      repo.findOne.mockResolvedValue({ ...mockTask });
+      repo.save.mockResolvedValue({
+        ...mockTask,
+        status: TaskStatus.IN_PROGRESS,
+      });
+
+      const result = await service.update(mockTask.id, {
+        status: TaskStatus.IN_PROGRESS,
+      });
+
+      expect(result.status).toBe(TaskStatus.IN_PROGRESS);
+      expect(gateway.sendToUser).not.toHaveBeenCalled();
+    });
+
+    it('retire l assignee si assigneeId est null', async () => {
+      repo.findOne.mockResolvedValue({ ...mockTaskWithAssignee });
+      repo.save.mockResolvedValue({ ...mockTask, assignee: null });
+
+      const result = await service.update(mockTask.id, { assigneeId: null });
+
+      expect(result.assignee).toBeNull();
+      expect(gateway.sendToUser).not.toHaveBeenCalled();
+    });
+
     it('lève NotFoundException si la tâche est introuvable', async () => {
       repo.findOne.mockResolvedValue(null);
 

@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsEnum,
   IsUUID,
+  ValidateIf,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TaskStatus, TaskPriority } from '../enums';
@@ -60,10 +61,12 @@ export class CreateTaskDto {
 
   @ApiPropertyOptional({
     example: '58779cc2-d7d6-463e-8fed-95f0ef5c4094',
-    description: "UUID de l'utilisateur assigné",
+    description: "UUID de l'utilisateur assigné (null pour désassigner)",
     format: 'uuid',
+    nullable: true,
   })
+  @ValidateIf((o: CreateTaskDto) => o.assigneeId !== null)
   @IsUUID('4')
   @IsOptional()
-  assigneeId?: string;
+  assigneeId?: string | null;
 }
