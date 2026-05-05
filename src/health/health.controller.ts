@@ -5,6 +5,7 @@ import {
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 import { Public } from '../auth/decorators/public.decorator';
+import { SkipTransform } from '../common/decorators/skip-transform.decorator';
 import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 
 @ApiTags('health')
@@ -20,6 +21,7 @@ export class HealthController {
    * Verifies that the database connection is alive.
    */
   @Public()
+  @SkipTransform()
   @Get()
   @HealthCheck()
   @ApiOperation({ summary: "Vérifier la santé de l'API et de la DB" })

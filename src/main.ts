@@ -4,7 +4,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { join } from 'node:path';
 import helmet from 'helmet';
@@ -45,10 +44,7 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new GlobalExceptionFilter());
-  app.useGlobalInterceptors(
-    new LoggingInterceptor(),
-    new TransformInterceptor(), // TODO: désactiver si les tests e2e (S14) échouent (.body.data au lieu de .body)
-  );
+  app.useGlobalInterceptors(new LoggingInterceptor());
 
   // Servir les fichiers statiques depuis /public (ex: test-ws.html)
   app.useStaticAssets(join(__dirname, '..', 'public'));
