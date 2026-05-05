@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { DataSource } from 'typeorm';

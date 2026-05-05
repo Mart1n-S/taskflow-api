@@ -29,27 +29,22 @@ const mockLoginResponse: LoginResponse = {
 
 describe('AuthController', () => {
   let controller: AuthController;
-  let authService: jest.Mocked<Pick<AuthService, 'login'>>;
-  let usersService: jest.Mocked<Pick<UsersService, 'findOne'>>;
+  let loginMock: jest.Mock;
+  let findOneMock: jest.Mock;
 
   beforeEach(async () => {
+    loginMock = jest.fn().mockReturnValue(mockLoginResponse);
+    findOneMock = jest.fn().mockResolvedValue(mockUser);
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
-        {
-          provide: AuthService,
-          useValue: { login: jest.fn().mockReturnValue(mockLoginResponse) },
-        },
-        {
-          provide: UsersService,
-          useValue: { findOne: jest.fn().mockResolvedValue(mockUser) },
-        },
+        { provide: AuthService, useValue: { login: loginMock } },
+        { provide: UsersService, useValue: { findOne: findOneMock } },
       ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
-    authService = module.get(AuthService);
-    usersService = module.get(UsersService);
   });
 
   afterEach(() => jest.clearAllMocks());
@@ -66,7 +61,7 @@ describe('AuthController', () => {
 
       const result = controller.login(req);
 
-      expect(authService.login).toHaveBeenCalledWith(reqUser);
+      expect(loginMock).toHaveBeenCalledWith(reqUser);
       expect(result).toEqual(mockLoginResponse);
     });
   });
@@ -81,7 +76,7 @@ describe('AuthController', () => {
 
       const result = await controller.me(currentUser);
 
-      expect(usersService.findOne).toHaveBeenCalledWith(mockUser.id);
+      expect(findOneMock).toHaveBeenCalledWith(mockUser.id);
       expect(result).toEqual(mockUser);
     });
   });

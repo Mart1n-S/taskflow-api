@@ -31,13 +31,13 @@ describe('JwtAuthGuard', () => {
     expect(result).toBe(true);
   });
 
-  it('delègue à AuthGuard(jwt) si la route est protégée', () => {
+  it('delègue à AuthGuard(jwt) si la route est protégée', async () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
     const superSpy = jest
       .spyOn(Object.getPrototypeOf(JwtAuthGuard.prototype), 'canActivate')
       .mockReturnValue(true);
 
-    guard.canActivate(createMockContext());
+    await Promise.resolve(guard.canActivate(createMockContext()));
 
     expect(superSpy).toHaveBeenCalled();
     superSpy.mockRestore();

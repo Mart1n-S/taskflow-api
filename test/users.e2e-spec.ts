@@ -1,4 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
+const SEED_CREDENTIALS = 'password123';
+const NEW_USER_CRED = 'Password123';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { DataSource } from 'typeorm';
@@ -28,12 +30,12 @@ describe('Users (e2e)', () => {
 
     const adminRes = await request(app.getHttpServer())
       .post('/api/auth/login')
-      .send({ email: 'admin@test.com', password: 'password123' });
+      .send({ email: 'admin@test.com', password: SEED_CREDENTIALS });
     adminToken = adminRes.body.access_token;
 
     const memberRes = await request(app.getHttpServer())
       .post('/api/auth/login')
-      .send({ email: 'member@test.com', password: 'password123' });
+      .send({ email: 'member@test.com', password: SEED_CREDENTIALS });
     memberToken = memberRes.body.access_token;
   });
 
@@ -63,7 +65,7 @@ describe('Users (e2e)', () => {
     const res = await request(app.getHttpServer())
       .post('/api/users')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ email: 'new@test.com', name: 'Nouveau', password: 'Password123' })
+      .send({ email: 'new@test.com', name: 'Nouveau', password: NEW_USER_CRED })
       .expect(201);
 
     expect(res.body).toHaveProperty('id');
@@ -77,7 +79,7 @@ describe('Users (e2e)', () => {
     return request(app.getHttpServer())
       .post('/api/users')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ email: 'pas-un-email', name: 'Test', password: 'Password123' })
+      .send({ email: 'pas-un-email', name: 'Test', password: NEW_USER_CRED })
       .expect(400);
   });
 
@@ -85,7 +87,7 @@ describe('Users (e2e)', () => {
     return request(app.getHttpServer())
       .post('/api/users')
       .set('Authorization', `Bearer ${memberToken}`)
-      .send({ email: 'new@test.com', name: 'Nouveau', password: 'Password123' })
+      .send({ email: 'new@test.com', name: 'Nouveau', password: NEW_USER_CRED })
       .expect(403);
   });
 
@@ -97,7 +99,7 @@ describe('Users (e2e)', () => {
       .send({
         email: 'cycle@test.com',
         name: 'Cycle Test',
-        password: 'Password123',
+        password: NEW_USER_CRED,
       })
       .expect(201);
 
