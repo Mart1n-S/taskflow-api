@@ -5,6 +5,8 @@ import { DataSource } from 'typeorm';
 import { createTestApp, cleanDatabase } from './helpers/app.helper';
 import { seedTestUsers } from './helpers/seed.helper';
 
+const SEED_CREDENTIALS = 'password123';
+
 describe('Auth (e2e)', () => {
   let app: INestApplication;
   let dataSource: DataSource;
@@ -39,7 +41,7 @@ describe('Auth (e2e)', () => {
     it('200 + token avec les bons credentials', async () => {
       const res = await request(app.getHttpServer())
         .post('/api/auth/login')
-        .send({ email: 'admin@test.com', password: 'password123' })
+        .send({ email: 'admin@test.com', password: SEED_CREDENTIALS })
         .expect(200);
 
       expect(res.body).toHaveProperty('access_token');
@@ -58,7 +60,21 @@ describe('Auth (e2e)', () => {
     it('401 avec email inconnu', () => {
       return request(app.getHttpServer())
         .post('/api/auth/login')
-        .send({ email: 'nobody@test.com', password: 'password123' })
+        .send({ email: 'nobody@test.com', password: SEED_CREDENTIALS })
+        .expect(401);
+    });
+
+    it('401 si le body est vide (AuthGuard court-circuite le DTO)', () => {
+      return request(app.getHttpServer())
+        .post('/api/auth/login')
+        .send({})
+        .expect(401);
+    });
+
+    it('401 si le format email est invalide (AuthGuard court-circuite le DTO)', () => {
+      return request(app.getHttpServer())
+        .post('/api/auth/login')
+        .send({ email: 'pas-un-email', password: SEED_CREDENTIALS })
         .expect(401);
     });
   });
@@ -71,21 +87,30 @@ describe('Auth (e2e)', () => {
     beforeEach(async () => {
       const res = await request(app.getHttpServer())
         .post('/api/auth/login')
-        .send({ email: 'admin@test.com', password: 'password123' });
+        .send({ email: 'admin@test.com', password: SEED_CREDENTIALS });
       accessToken = res.body.access_token;
     });
 
-    it('200 + profil connecté', async () => {
+    it('200 + profil connecté sans passwordHash', async () => {
       const res = await request(app.getHttpServer())
         .get('/api/auth/me')
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
       expect(res.body.email).toBe('admin@test.com');
+      expect(res.body).not.toHaveProperty('passwordHash');
+      expect(res.body).not.toHaveProperty('password_hash');
     });
 
     it('401 sans token', () => {
       return request(app.getHttpServer()).get('/api/auth/me').expect(401);
+    });
+
+    it('401 avec un token malformé', () => {
+      return request(app.getHttpServer())
+        .get('/api/auth/me')
+        .set('Authorization', 'Bearer token.invalide.ici')
+        .expect(401);
     });
   });
 });
