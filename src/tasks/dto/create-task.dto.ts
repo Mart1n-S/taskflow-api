@@ -59,7 +59,7 @@ export class CreateTaskDto {
   projectId!: string;
 
   @ApiPropertyOptional({
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: '58779cc2-d7d6-463e-8fed-95f0ef5c4094',
     description: "UUID de l'utilisateur assigné",
     format: 'uuid',
   })

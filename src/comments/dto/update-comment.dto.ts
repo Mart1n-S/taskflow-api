@@ -1,4 +1,4 @@
-import { PartialType, PickType } from '@nestjs/mapped-types';
+import { PartialType, PickType } from '@nestjs/swagger';
 import { CreateCommentDto } from './create-comment.dto';
 
 export class UpdateCommentDto extends PartialType(

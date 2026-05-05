@@ -271,7 +271,42 @@ openssl rand -base64 62
 docker compose -f docker-compose.prod.yml --env-file .env.production up --build -d
 ```
 
-### 3. Vérifier la santé de l'API
+### 3. Appliquer les migrations
+
+Les migrations doivent être lancées depuis le container `api` car PostgreSQL prod n'est pas exposé sur la machine :
+
+```bash
+docker exec -it taskflow_api node -e "
+const { AppDataSource } = require('./dist/database/data-source');
+AppDataSource.initialize().then(ds => ds.runMigrations()).then(() => { console.log('Migrations OK'); process.exit(0); });
+"
+```
+
+### 4. Seeder la base (optionnel)
+
+```bash
+docker exec -it taskflow_api node -e "
+const { AppDataSource } = require('./dist/database/data-source');
+const bcrypt = require('bcrypt');
+AppDataSource.initialize().then(async ds => {
+  const hash = await bcrypt.hash('password123', 10);
+  const users = [
+    ['alice@taskflow.dev', 'Alice Dupont', 'admin'],
+    ['bob@taskflow.dev', 'Bob Martin', 'member'],
+    ['charlie@taskflow.dev', 'Charlie Bernard', 'viewer'],
+  ];
+  for (const [email, name, role] of users) {
+    await ds.query(
+      \`INSERT INTO users (email, name, role, password_hash) VALUES ('\${email}', '\${name}', '\${role}', '\${hash}') ON CONFLICT DO NOTHING\`
+    );
+  }
+  console.log('Seed OK');
+  process.exit(0);
+});
+"
+```
+
+### 5. Vérifier la santé de l'API
 
 ```bash
 curl http://localhost:3000/api/health
@@ -281,7 +316,6 @@ curl http://localhost:3000/api/health
 Le Dockerfile est **multi-stage** :
 - `builder` : compile TypeScript avec toutes les dépendances
 - `runner` : image légère (~241 MB), prod dependencies uniquement, utilisateur non-root
-
 ---
 
 ## CI GitHub Actions
