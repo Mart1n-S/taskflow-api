@@ -18,12 +18,4 @@ export class CreateCommentDto {
   })
   @IsUUID('4')
   taskId!: string;
-
-  @ApiProperty({
-    example: '550e8400-e29b-41d4-a716-446655440000',
-    description: "UUID de l'auteur du commentaire",
-    format: 'uuid',
-  })
-  @IsUUID('4')
-  authorId!: string;
 }

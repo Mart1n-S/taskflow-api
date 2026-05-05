@@ -54,6 +54,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       if (dbError.code === '23505') {
         status = HttpStatus.CONFLICT;
         message = 'Cette ressource existe déjà (contrainte unique)';
+      } else if (dbError.code === '23503') {
+        status = HttpStatus.UNPROCESSABLE_ENTITY;
+        message =
+          'Une ressource référencée est introuvable (clé étrangère invalide)';
       }
       this.logger.error('QueryFailedError', exception.message);
     } else {

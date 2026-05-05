@@ -17,11 +17,11 @@ export class CommentsService {
   /**
    * Creates a new comment, resolving task and author relations from their IDs.
    */
-  async create(dto: CreateCommentDto): Promise<Comment> {
+  async create(dto: CreateCommentDto, authorId: string): Promise<Comment> {
     const comment = this.commentsRepository.create({
       content: dto.content,
       task: { id: dto.taskId },
-      author: { id: dto.authorId },
+      author: { id: authorId },
     });
     const saved = await this.commentsRepository.save(comment);
     this.logger.log(`Commentaire créé : ${saved.id}`);

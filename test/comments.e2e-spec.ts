@@ -15,7 +15,6 @@ describe('Comments (e2e)', () => {
   let dataSource: DataSource;
   let adminToken: string;
   let taskId: string;
-  let authorId: string;
   let commentId: string;
 
   beforeAll(async () => {
@@ -25,7 +24,6 @@ describe('Comments (e2e)', () => {
   beforeEach(async () => {
     await cleanDatabase(dataSource);
     const { admin } = await seedTestUsers(dataSource);
-    authorId = admin.id;
 
     const teamRepo = dataSource.getRepository(Team);
     const team = await teamRepo.save(teamRepo.create({ name: 'Test Team' }));
@@ -123,7 +121,6 @@ describe('Comments (e2e)', () => {
         .send({
           content: 'Nouveau commentaire',
           taskId,
-          authorId,
         })
         .expect(201);
 
@@ -135,14 +132,14 @@ describe('Comments (e2e)', () => {
       return request(app.getHttpServer())
         .post('/api/comments')
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ taskId, authorId })
+        .send({ taskId })
         .expect(400);
     });
 
     it('401 sans token', () => {
       return request(app.getHttpServer())
         .post('/api/comments')
-        .send({ content: 'Test', taskId, authorId })
+        .send({ content: 'Test', taskId })
         .expect(401);
     });
   });

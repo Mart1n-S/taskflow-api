@@ -10,6 +10,8 @@ import {
   HttpStatus,
   ParseUUIDPipe,
 } from '@nestjs/common';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { User } from '../users/entities/user.entity';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -36,8 +38,11 @@ export class CommentsController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un commentaire' })
   @ApiCreatedResponse({ description: 'Commentaire créé avec succès' })
-  create(@Body() createCommentDto: CreateCommentDto): Promise<Comment> {
-    return this.commentsService.create(createCommentDto);
+  create(
+    @Body() createCommentDto: CreateCommentDto,
+    @CurrentUser() user: User,
+  ): Promise<Comment> {
+    return this.commentsService.create(createCommentDto, user.id);
   }
 
   @Get()

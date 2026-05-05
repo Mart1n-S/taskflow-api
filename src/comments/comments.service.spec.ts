@@ -87,14 +87,14 @@ describe('CommentsService', () => {
     const dto = {
       content: 'Nouveau commentaire',
       taskId: 'task-uuid-001',
-      authorId: 'user-uuid-001',
     };
+    const authorId = 'user-uuid-001';
 
     it('crée et retourne un commentaire', async () => {
       repo.create.mockReturnValue(mockComment);
       repo.save.mockResolvedValue(mockComment);
 
-      const result = await service.create(dto);
+      const result = await service.create(dto, authorId);
 
       expect(result).toEqual(mockComment);
       expect(repo.create).toHaveBeenCalledTimes(1);

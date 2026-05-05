@@ -310,8 +310,15 @@ AppDataSource.initialize().then(async ds => {
 
 ```bash
 curl http://localhost:3000/api/health
-# {"data":{"status":"ok","timestamp":"2026-04-28T18:03:32.896Z"},"statusCode":200,"timestamp":"2026-04-28T18:03:32.897Z"}
+# {
+#   "status": "ok",
+#   "info": { "database": { "status": "up" } },
+#   "error": {},
+#   "details": { "database": { "status": "up" } }
+# }
 ```
+
+> Retourne `503 Service Unavailable` si la base de données est inaccessible.
 
 Le Dockerfile est **multi-stage** :
 - `builder` : compile TypeScript avec toutes les dépendances
