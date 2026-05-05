@@ -12,6 +12,7 @@ import { User } from './entities/user.entity';
 import { UserRole } from './enums/user-role.enum';
 import {
   createMockRepository,
+  createMockQueryBuilder,
   type MockRepository,
 } from '../common/helpers/mock-repository.helper';
 
@@ -193,6 +194,32 @@ describe('UsersService', () => {
       await expect(
         service.update('id-inexistant', { name: 'Test' }, adminPayload),
       ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('findByEmailWithPassword', () => {
+    it('retourne le user avec passwordHash si l email existe', async () => {
+      const qb = createMockQueryBuilder();
+      qb.getOne.mockResolvedValue(mockUser);
+      repo.createQueryBuilder.mockReturnValue(qb);
+
+      const result = await service.findByEmailWithPassword(mockUser.email);
+
+      expect(repo.createQueryBuilder).toHaveBeenCalledWith('user');
+      expect(qb.addSelect).toHaveBeenCalledWith('user.passwordHash');
+      expect(qb.where).toHaveBeenCalledWith('user.email = :email', {
+        email: mockUser.email,
+      });
+      expect(result).toEqual(mockUser);
+    });
+
+    it('retourne null si l email n existe pas', async () => {
+      const qb = createMockQueryBuilder();
+      repo.createQueryBuilder.mockReturnValue(qb);
+
+      const result = await service.findByEmailWithPassword('nobody@test.com');
+
+      expect(result).toBeNull();
     });
   });
 

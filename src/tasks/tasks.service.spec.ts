@@ -134,6 +134,21 @@ describe('TasksService', () => {
   });
 
   describe('update', () => {
+    it('met à jour le projectId de la tache', async () => {
+      const updated = {
+        ...mockTask,
+        project: { id: 'project-uuid-002' } as Task['project'],
+      };
+      repo.findOne.mockResolvedValue({ ...mockTask });
+      repo.save.mockResolvedValue(updated);
+
+      const result = await service.update(mockTask.id, {
+        projectId: 'project-uuid-002',
+      });
+
+      expect(result.project.id).toBe('project-uuid-002');
+    });
+
     it("met à jour le titre sans notifier si l'assigné ne change pas", async () => {
       repo.findOne.mockResolvedValue({ ...mockTask });
       repo.save.mockResolvedValue({ ...mockTask, title: 'Titre modifié' });

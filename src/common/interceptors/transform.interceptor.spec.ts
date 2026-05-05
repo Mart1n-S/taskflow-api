@@ -31,6 +31,18 @@ describe('TransformInterceptor', () => {
   describe('sans @SkipTransform()', () => {
     beforeEach(() => overrideMock.mockReturnValue(false));
 
+    it('enveloppe la reponse si getAllAndOverride retourne undefined (aucun decorateur)', async () => {
+      overrideMock.mockReturnValue(undefined);
+      const context = createMockContext(200);
+
+      const result = await firstValueFrom(
+        interceptor.intercept(context, createCallHandler({ id: '1' })),
+      );
+
+      expect(result).toHaveProperty('data');
+      expect(result).toHaveProperty('statusCode');
+    });
+
     it('enveloppe la reponse dans { data, statusCode, timestamp }', async () => {
       const payload = { id: '1', name: 'Alice' };
       const context = createMockContext(200);
