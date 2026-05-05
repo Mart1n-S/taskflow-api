@@ -61,6 +61,28 @@ describe('Users (e2e)', () => {
     return request(app.getHttpServer()).get('/api/users').expect(401);
   });
 
+  it('GET /api/users/:id → 200 + utilisateur trouve', async () => {
+    const listRes = await request(app.getHttpServer())
+      .get('/api/users')
+      .set('Authorization', `Bearer ${adminToken}`);
+    const userId = listRes.body[0].id;
+
+    const res = await request(app.getHttpServer())
+      .get(`/api/users/${userId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(200);
+
+    expect(res.body).toHaveProperty('id', userId);
+    expect(res.body).not.toHaveProperty('passwordHash');
+  });
+
+  it('GET /api/users/:id → 404 si introuvable', () => {
+    return request(app.getHttpServer())
+      .get('/api/users/00000000-0000-0000-0000-000000000000')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(404);
+  });
+
   it('POST /api/users → 201 par admin', async () => {
     const res = await request(app.getHttpServer())
       .post('/api/users')
@@ -83,11 +105,52 @@ describe('Users (e2e)', () => {
       .expect(400);
   });
 
+  it('POST /api/users → 409 si email deja utilise', () => {
+    return request(app.getHttpServer())
+      .post('/api/users')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        email: 'admin@test.com',
+        name: 'Doublon',
+        password: NEW_USER_CRED,
+      })
+      .expect(409);
+  });
+
   it('POST /api/users → 403 par member (non admin)', () => {
     return request(app.getHttpServer())
       .post('/api/users')
       .set('Authorization', `Bearer ${memberToken}`)
       .send({ email: 'new@test.com', name: 'Nouveau', password: NEW_USER_CRED })
+      .expect(403);
+  });
+
+  it('PATCH /api/users/:id → 200 admin modifie son propre profil', async () => {
+    const listRes = await request(app.getHttpServer())
+      .get('/api/users')
+      .set('Authorization', `Bearer ${adminToken}`);
+    const adminId = listRes.body[0].id;
+
+    const res = await request(app.getHttpServer())
+      .patch(`/api/users/${adminId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ name: 'Admin Modifie' })
+      .expect(200);
+
+    expect(res.body.name).toBe('Admin Modifie');
+  });
+
+  it('PATCH /api/users/:id → 403 member tente de modifier un autre profil', async () => {
+    const listRes = await request(app.getHttpServer())
+      .get('/api/users')
+      .set('Authorization', `Bearer ${adminToken}`);
+    const users = listRes.body as Array<{ id: string; email: string }>;
+    const adminId = users.find((u) => u.email === 'admin@test.com')?.id;
+
+    return request(app.getHttpServer())
+      .patch(`/api/users/${adminId}`)
+      .set('Authorization', `Bearer ${memberToken}`)
+      .send({ name: 'Tentative' })
       .expect(403);
   });
 

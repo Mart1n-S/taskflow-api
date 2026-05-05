@@ -1,6 +1,12 @@
+jest.mock('bcrypt');
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { UserRole } from './enums/user-role.enum';
@@ -47,6 +53,7 @@ describe('UsersService', () => {
    */
   beforeEach(async () => {
     repo = createMockRepository<User>();
+    (bcrypt.hash as jest.Mock).mockResolvedValue('$2b$10$hashed');
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -129,6 +136,63 @@ describe('UsersService', () => {
 
       await expect(service.create(dto)).rejects.toThrow(ConflictException);
       expect(repo.save).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('update', () => {
+    const adminPayload = {
+      id: mockUser.id,
+      email: mockUser.email,
+      role: UserRole.ADMIN,
+    };
+    const memberPayload = {
+      id: 'other-uuid',
+      email: 'other@test.com',
+      role: UserRole.MEMBER,
+    };
+
+    it('met a jour le profil (admin modifie son propre profil)', async () => {
+      const updated = { ...mockUser, name: 'Alice Updated' };
+      repo.findOne.mockResolvedValue(mockUser);
+      repo.save.mockResolvedValue(updated);
+
+      const result = await service.update(
+        mockUser.id,
+        { name: 'Alice Updated' },
+        adminPayload,
+      );
+
+      expect(result.name).toBe('Alice Updated');
+    });
+
+    it('leve ForbiddenException si member tente de modifier un autre profil', async () => {
+      await expect(
+        service.update(mockUser.id, { name: 'Test' }, memberPayload),
+      ).rejects.toThrow(ForbiddenException);
+      expect(repo.findOne).not.toHaveBeenCalled();
+    });
+
+    it('leve ConflictException si le nouvel email est deja pris', async () => {
+      const otherUser = {
+        ...mockUser,
+        id: 'other-uuid',
+        email: 'taken@test.com',
+      };
+      repo.findOne
+        .mockResolvedValueOnce(mockUser)
+        .mockResolvedValueOnce(otherUser);
+
+      await expect(
+        service.update(mockUser.id, { email: 'taken@test.com' }, adminPayload),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('leve NotFoundException si l utilisateur est introuvable', async () => {
+      repo.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.update('id-inexistant', { name: 'Test' }, adminPayload),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
