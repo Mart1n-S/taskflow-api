@@ -100,6 +100,19 @@ describe('CommentsService', () => {
       expect(repo.create).toHaveBeenCalledTimes(1);
       expect(repo.save).toHaveBeenCalledTimes(1);
     });
+
+    it('appelle repo.create avec le bon authorId et taskId', async () => {
+      repo.create.mockReturnValue(mockComment);
+      repo.save.mockResolvedValue(mockComment);
+
+      await service.create(dto, authorId);
+
+      expect(repo.create).toHaveBeenCalledWith({
+        content: dto.content,
+        task: { id: dto.taskId },
+        author: { id: authorId },
+      });
+    });
   });
 
   describe('update', () => {

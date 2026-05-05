@@ -10,6 +10,12 @@ import type { Repository } from 'typeorm';
  * repo.findOne.mockResolvedValue(mockUser);
  * ```
  */
+export type MockQueryBuilder = {
+  addSelect: jest.Mock;
+  where: jest.Mock;
+  getOne: jest.Mock;
+};
+
 export type MockRepository<T extends object> = {
   find: jest.Mock;
   findOne: jest.Mock;
@@ -18,7 +24,19 @@ export type MockRepository<T extends object> = {
   create: jest.Mock;
   remove: jest.Mock;
   count: jest.Mock;
+  createQueryBuilder: jest.Mock;
 } & Partial<Repository<T>>;
+
+export const createMockQueryBuilder = (): MockQueryBuilder => {
+  const qb: MockQueryBuilder = {
+    addSelect: jest.fn(),
+    where: jest.fn(),
+    getOne: jest.fn().mockResolvedValue(null),
+  };
+  qb.addSelect.mockReturnValue(qb);
+  qb.where.mockReturnValue(qb);
+  return qb;
+};
 
 export const createMockRepository = <
   T extends object,
@@ -30,4 +48,5 @@ export const createMockRepository = <
   create: jest.fn(),
   remove: jest.fn(),
   count: jest.fn(),
+  createQueryBuilder: jest.fn(),
 });

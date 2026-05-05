@@ -1,25 +1,62 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import request from 'supertest';
-import { App } from 'supertest/types';
-import { AppModule } from './../src/app.module';
+import { INestApplication } from '@nestjs/common';
+import { DataSource } from 'typeorm';
+import { createTestApp, cleanDatabase } from './helpers/app.helper';
+import { seedTestUsers } from './helpers/seed.helper';
 
-describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+describe('App (e2e)', () => {
+  let app: INestApplication;
+  let dataSource: DataSource;
 
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
+  beforeAll(async () => {
+    ({ app, dataSource } = await createTestApp());
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect({ message: 'TaskFlow API', version: '1.0.0' });
+  beforeEach(async () => {
+    await cleanDatabase(dataSource);
+    await seedTestUsers(dataSource);
+  });
+
+  afterAll(async () => {
+    await dataSource.destroy();
+    await app.close();
+  });
+
+  describe('GET /api/', () => {
+    it('200 + informations de l API', async () => {
+      const res = await request(app.getHttpServer()).get('/api/').expect(200);
+
+      expect(res.body).toMatchObject({
+        message: 'TaskFlow API',
+        version: '1.0.0',
+      });
+    });
+  });
+
+  describe('GET /api/health', () => {
+    it('200 + status ok avec database up', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/health')
+        .expect(200);
+
+      expect(res.body).toMatchObject({
+        status: 'ok',
+        info: { database: { status: 'up' } },
+      });
+    });
+
+    it('pas d enveloppe data/statusCode/timestamp (SkipTransform actif)', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/health')
+        .expect(200);
+
+      expect(res.body).not.toHaveProperty('data');
+      expect(res.body).not.toHaveProperty('statusCode');
+    });
+
+    it('accessible sans token (route @Public)', async () => {
+      await request(app.getHttpServer()).get('/api/health').expect(200);
+    });
   });
 });

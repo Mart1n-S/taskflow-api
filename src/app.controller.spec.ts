@@ -22,14 +22,4 @@ describe('AppController', () => {
       });
     });
   });
-
-  describe('healthCheck', () => {
-    it('retourne le statut ok avec un timestamp', () => {
-      const result = appController.healthCheck();
-
-      expect(result.status).toBe('ok');
-      expect(result.timestamp).toBeDefined();
-      expect(new Date(result.timestamp).toISOString()).toBe(result.timestamp);
-    });
-  });
 });

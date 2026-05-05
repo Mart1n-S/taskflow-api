@@ -134,6 +134,21 @@ describe('TasksService', () => {
   });
 
   describe('update', () => {
+    it('met à jour le projectId de la tache', async () => {
+      const updated = {
+        ...mockTask,
+        project: { id: 'project-uuid-002' } as Task['project'],
+      };
+      repo.findOne.mockResolvedValue({ ...mockTask });
+      repo.save.mockResolvedValue(updated);
+
+      const result = await service.update(mockTask.id, {
+        projectId: 'project-uuid-002',
+      });
+
+      expect(result.project.id).toBe('project-uuid-002');
+    });
+
     it("met à jour le titre sans notifier si l'assigné ne change pas", async () => {
       repo.findOne.mockResolvedValue({ ...mockTask });
       repo.save.mockResolvedValue({ ...mockTask, title: 'Titre modifié' });
@@ -172,6 +187,31 @@ describe('TasksService', () => {
 
       await service.update(mockTask.id, { assigneeId: 'user-uuid-001' });
 
+      expect(gateway.sendToUser).not.toHaveBeenCalled();
+    });
+
+    it('met à jour le status de la tache', async () => {
+      repo.findOne.mockResolvedValue({ ...mockTask });
+      repo.save.mockResolvedValue({
+        ...mockTask,
+        status: TaskStatus.IN_PROGRESS,
+      });
+
+      const result = await service.update(mockTask.id, {
+        status: TaskStatus.IN_PROGRESS,
+      });
+
+      expect(result.status).toBe(TaskStatus.IN_PROGRESS);
+      expect(gateway.sendToUser).not.toHaveBeenCalled();
+    });
+
+    it('retire l assignee si assigneeId est null', async () => {
+      repo.findOne.mockResolvedValue({ ...mockTaskWithAssignee });
+      repo.save.mockResolvedValue({ ...mockTask, assignee: null });
+
+      const result = await service.update(mockTask.id, { assigneeId: null });
+
+      expect(result.assignee).toBeNull();
       expect(gateway.sendToUser).not.toHaveBeenCalled();
     });
 
