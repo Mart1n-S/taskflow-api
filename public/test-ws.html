@@ -2,46 +2,113 @@
 <html lang="fr">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Test WebSocket TaskFlow</title>
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow - Test WebSocket</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
-    <h1>Test WebSocket</h1>
-    <div>
-        <label>JWT Token : <input id="token" type="text" size="60" /></label>
-        <button onclick="connect()">Se connecter</button>
+
+  <div class="page-ws">
+
+    <!-- En-tête -->
+    <div class="page-header">
+      <div>
+        <h1>Test WebSocket</h1>
+        <div class="ws-status">
+          <span class="ws-dot off" id="ws-dot"></span>
+          <span id="ws-label">Déconnecté</span>
+        </div>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-sm" id="btn-refresh">Actualiser <i class="bi bi-arrow-clockwise"></i></button>
+        <a href="login.html" id="btn-logout" class="back-link">Déconnexion <i class="bi bi-box-arrow-right"></i></a>
+      </div>
     </div>
-    <div>
-        <label>Project ID : <input id="projectId" type="text" /></label>
-        <button onclick="joinProject()">Rejoindre</button>
+
+    <!-- Connexion WebSocket -->
+    <div class="panel">
+      <p class="panel-title">Connexion WebSocket</p>
+      <div class="form-group">
+        <label for="token">JWT Token</label>
+        <div class="input-row">
+          <input id="token" type="text" placeholder="eyJhbGci…" spellcheck="false">
+          <button class="btn btn-primary btn-sm" id="btn-connect">Connecter</button>
+        </div>
+      </div>
     </div>
-    <hr />
-    <h2>Événements reçus :</h2>
-    <ul id="events"></ul>
 
-    <script>
-        let socket;
-        function log(msg) {
-            const li = document.createElement('li');
-            li.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-            document.getElementById('events').prepend(li);
-        }
+    <!-- Projets -->
+    <div class="panel">
+      <p class="panel-title">Projets</p>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Statut</th>
+              <th>Description</th>
+              <th>UUID</th>
+            </tr>
+          </thead>
+          <tbody id="projects-body">
+            <tr><td colspan="3" class="td-empty">Chargement…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-        function connect() {
-            const token = document.getElementById('token').value;
-            socket = io('http://localhost:3000/notifications', { auth: { token } });
-            socket.on('connect', () => log(`Connecté : ${socket.id}`));
-            socket.on('disconnect', () => log('Déconnecté'));
-            socket.on('task:assigned', (data) => log(`TÂCHE ASSIGNÉE : ${JSON.stringify(data)}`));
-        }
+    <!-- Tâches -->
+    <div class="panel">
+      <p class="panel-title">Tâches</p>
+      <div class="table-wrapper">
+        <table class="data-table" id="tasks-table">
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Statut</th>
+              <th>Priorité</th>
+              <th>Assigné</th>
+              <th id="th-assign" class="th-assign-hidden">Assigner</th>
+            </tr>
+          </thead>
+          <tbody id="tasks-body">
+            <tr><td colspan="4" class="td-empty">Chargement…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-        function joinProject() {
-            const projectId = document.getElementById('projectId').value;
-            socket.emit('join:project', projectId, (ack) => log(`Rejoint projet ${ack.joined}`));
-        }
-    </script>
+    <!-- Rejoindre un projet -->
+    <div class="panel">
+      <p class="panel-title">Rejoindre un projet</p>
+      <div class="form-group">
+        <label for="projectId">UUID du projet</label>
+        <div class="input-row">
+          <input id="projectId" type="text" placeholder="550e8400-e29b-41d4-a716-446655440000">
+          <button class="btn btn-sm" id="btn-join">Rejoindre</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Journal d'événements -->
+    <div class="panel">
+      <div class="events-header">
+        <p class="panel-title panel-title-inline">Événements reçus</p>
+        <button class="btn btn-sm" id="btn-clear">Effacer</button>
+      </div>
+      <ul id="events"></ul>
+      <p id="events-empty" class="events-empty">Aucun événement reçu.</p>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="js/ws.js"></script>
+  <script src="js/data.js"></script>
+
 </body>
 
 </html>

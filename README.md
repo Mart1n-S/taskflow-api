@@ -232,7 +232,48 @@ const socket = io('http://localhost:3000/notifications', {
 | `join:project`  | client → serveur | Rejoindre la room d'un projet            |
 | `task:assigned` | serveur → client | Notifié quand une tâche lui est assignée |
 
-**Tester en temps réel** - ouvrir http://localhost:3000/test-ws.html dans deux onglets, connecter Alice (admin) et Bob (member), puis assigner une tâche à Bob via `PATCH /api/tasks/:id` avec `{ "assigneeId": "<bob_id>" }`.
+### Client HTML de test
+
+Un client de test est disponible via les fichiers statiques servis par NestJS.
+
+#### Pages disponibles
+
+| URL | Description |
+| --- | --- |
+| `http://localhost:3000/login.html` | Connexion — génère le JWT et redirige automatiquement |
+| `http://localhost:3000/test-ws.html` | Interface de test WebSocket |
+
+#### Fonctionnalités de la page de test
+
+- **Liste des projets** — affiche tous les projets avec leur statut ; bouton 📋 pour copier l'UUID dans le presse-papier
+- **Liste des tâches** — affiche toutes les tâches avec statut, priorité et assigné
+- **Assignation (admin uniquement)** — une colonne supplémentaire permet de choisir un utilisateur et d'assigner la tâche directement depuis l'interface
+- **Connexion WebSocket** — le token JWT est pré-rempli automatiquement depuis la session ; cliquer "Connecter"
+- **Rejoindre un projet** — coller l'UUID copié depuis le tableau des projets, puis cliquer "Rejoindre"
+- **Journal d'événements** — affiche tous les événements reçus en temps réel avec horodatage
+
+#### Scénario de test complet
+
+1. Ouvrir **deux onglets** de navigateur
+
+2. **Onglet 1 — Alice (admin)**
+   - Aller sur `http://localhost:3000/login.html`
+   - Se connecter avec `alice@taskflow.dev` / `password123`
+   - Dans la section *Connexion WebSocket*, cliquer **Connecter**
+   - Dans le tableau *Projets*, cliquer 📋 sur un projet pour copier son UUID
+   - Coller l'UUID dans le champ *Rejoindre un projet* et cliquer **Rejoindre**
+
+3. **Onglet 2 — Bob (member)**
+   - Ouvrir `http://localhost:3000/login.html` en navigation privée (session séparée)
+   - Se connecter avec `bob@taskflow.dev` / `password123`
+   - Cliquer **Connecter** dans la section *Connexion WebSocket*
+
+4. **Retourner dans l'onglet 1 (Alice)**
+   - Dans le tableau *Tâches*, sélectionner **Bob** dans le select de la colonne *Assigner*
+   - Cliquer **Assigner**
+
+5. **Vérifier dans l'onglet 2 (Bob)**
+   - L'événement `task:assigned` apparaît dans le journal avec les détails de la tâche
 
 ---
 
