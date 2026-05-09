@@ -1,0 +1,432 @@
+/* ================================================
+   Styles partagés - login.html & test-ws.html
+   ================================================ */
+
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --surface: #ffffff;
+  --bg: #f1f5f9;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --radius: 8px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* ---- Carte centrée (login) ---- */
+.page-center {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: .25rem;
+}
+
+.card-subtitle {
+  color: var(--text-muted);
+  font-size: .875rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ---- Layout page WS ---- */
+.page-ws {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.page-header h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.ws-status {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .8125rem;
+  color: var(--text-muted);
+}
+
+.ws-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+  transition: background .2s;
+}
+
+.ws-dot.on {
+  background: var(--success);
+}
+
+.ws-dot.off {
+  background: var(--danger);
+}
+
+/* ---- Panneaux ---- */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.panel-title {
+  font-size: .75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text-muted);
+  margin-bottom: .875rem;
+}
+
+/* ---- Formulaire ---- */
+.form-group {
+  margin-bottom: .875rem;
+}
+
+label {
+  display: block;
+  font-size: .8125rem;
+  font-weight: 500;
+  margin-bottom: .3rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  display: block;
+  width: 100%;
+  padding: .5rem .75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: .875rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface);
+  transition: border-color .15s, box-shadow .15s;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, .12);
+}
+
+input::placeholder {
+  color: var(--text-muted);
+}
+
+.input-row {
+  display: flex;
+  gap: .5rem;
+  align-items: flex-end;
+}
+
+.input-row input {
+  flex: 1;
+}
+
+/* ---- Boutons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: .875rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, border-color .15s;
+}
+
+.btn:hover {
+  background: var(--bg);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  color: #fff;
+}
+
+.btn-sm {
+  padding: .35rem .75rem;
+  font-size: .8125rem;
+}
+
+.btn-block {
+  width: 100%;
+  margin-top: .25rem;
+}
+
+/* ---- Message d'erreur (login) ---- */
+.error-msg {
+  color: var(--danger);
+  font-size: .8125rem;
+  min-height: 1.25rem;
+  margin-bottom: .5rem;
+}
+
+/* ---- Journal d'événements ---- */
+.events-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .875rem;
+}
+
+#events {
+  list-style: none;
+  max-height: 340px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.event-item {
+  display: flex;
+  gap: .75rem;
+  align-items: baseline;
+  padding: .4rem .5rem;
+  border-radius: 4px;
+  font-size: .8125rem;
+  background: var(--bg);
+}
+
+.event-time {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  font-size: .75rem;
+}
+
+.event-type {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.event-body {
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+.events-empty {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--text-muted);
+  font-size: .8125rem;
+}
+
+/* ---- En-tête page WS - actions à droite ---- */
+.page-header-actions {
+  display: flex;
+  gap: .75rem;
+  align-items: center;
+}
+
+/* Colonne assignation masquée par défaut, révélée par data.js pour les admins */
+.th-assign-hidden { display: none; }
+
+/* Titre de panel sans marge basse (variante dans events-header) */
+.panel-title-inline { margin-bottom: 0; }
+
+/* ---- Lien retour ---- */
+.back-link {
+  font-size: .8125rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: var(--primary);
+}
+
+/* ---- Tableaux de données ---- */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .8125rem;
+}
+
+.data-table thead th {
+  padding: .5rem .75rem;
+  text-align: left;
+  font-size: .7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text-muted);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background .1s;
+}
+
+.data-table tbody tr:last-child { border-bottom: none; }
+.data-table tbody tr:hover { background: var(--bg); }
+
+.data-table tbody td {
+  padding: .5rem .75rem;
+  vertical-align: middle;
+}
+
+.td-empty {
+  padding: 1.25rem .75rem !important;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.text-error { color: var(--danger); }
+
+/* ---- Badges statut / priorité ---- */
+.badge {
+  display: inline-block;
+  padding: .15rem .5rem;
+  border-radius: 99px;
+  font-size: .7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Statuts projet */
+.badge-active   { background: #dbeafe; color: #1d4ed8; }
+.badge-archived { background: #f1f5f9; color: #475569; }
+.badge-draft    { background: #ede9fe; color: #6d28d9; }
+
+/* Statuts tâche */
+.badge-status-todo        { background: #f1f5f9; color: #475569; }
+.badge-status-in_progress { background: #dbeafe; color: #1d4ed8; }
+.badge-status-done        { background: #dcfce7; color: #15803d; }
+
+/* Priorités tâche */
+.badge-priority-low    { background: #dcfce7; color: #15803d; }
+.badge-priority-medium { background: #fef9c3; color: #a16207; }
+.badge-priority-high   { background: #fee2e2; color: #b91c1c; }
+
+/* ---- UUID + bouton copier ---- */
+.uuid-cell {
+  display: flex;
+  align-items: center;
+  gap: .375rem;
+  white-space: nowrap;
+}
+
+.uuid-text {
+  font-family: ui-monospace, monospace;
+  font-size: .7rem;
+  color: var(--text-muted);
+}
+
+.btn-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .2rem;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: color .15s, background .15s;
+}
+
+.btn-copy:hover    { color: var(--primary); background: var(--bg); }
+.btn-copy-done     { color: var(--success) !important; }
+
+/* ---- Assignation (admin) ---- */
+.assign-row {
+  display: flex;
+  gap: .375rem;
+  align-items: center;
+}
+
+.assign-select {
+  padding: .3rem .5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: .8125rem;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--text);
+  max-width: 160px;
+}
+
+.assign-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}

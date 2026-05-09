@@ -27,6 +27,8 @@ async function bootstrap() {
             scriptSrc: ["'self'", "'unsafe-inline'", 'cdn.socket.io'],
             scriptSrcAttr: ["'unsafe-inline'"],
             connectSrc: ["'self'", 'ws:', 'wss:', 'cdn.socket.io', 'https:'],
+            styleSrc: ["'self'", 'https://cdn.jsdelivr.net'],
+            fontSrc: ["'self'", 'https://cdn.jsdelivr.net'],
           },
         },
       }),
